@@ -1,6 +1,6 @@
 {
   "name": "ng2-dropdown",
-  "version": "0.0.15",
+  "version": "0.0.17",
   "description": "Simple dropdown for your angular2 applications using bootstrap3.",
   "license": "MIT",
   "readmeFilename": "README.md",

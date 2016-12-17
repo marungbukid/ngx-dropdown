@@ -31,8 +31,10 @@ export class Gulpfile {
      */
     @Task()
     compile() {
-        return gulp.src("*.js", { read: false })
-            .pipe(shell(["tsc"]));
+        return gulp.src("package.json", { read: false })
+            .pipe(shell([
+                "\"node_modules/.bin/ngc\" -p tsconfig-aot.json"
+            ]));
     }
 
     // -------------------------------------------------------------------------
@@ -44,7 +46,7 @@ export class Gulpfile {
      */
     @Task()
     npmPublish() {
-        return gulp.src("*.js", { read: false })
+        return gulp.src("package.json", { read: false })
             .pipe(shell([
                 "cd ./build/package && npm publish"
             ]));
@@ -58,7 +60,7 @@ export class Gulpfile {
         const tsProject = ts.createProject("tsconfig.json");
         const tsResult = gulp.src(["./src/**/*.ts", "./typings/**/*.ts"])
             .pipe(sourcemaps.init())
-            .pipe(tsProject());
+            .pipe(ts(tsProject));
 
         return [
             tsResult.dts.pipe(gulp.dest("./build/package")),
@@ -66,25 +68,6 @@ export class Gulpfile {
                 .pipe(sourcemaps.write(".", { sourceRoot: "", includeContent: true }))
                 .pipe(gulp.dest("./build/package"))
         ];
-    }
-
-    /**
-     * Moves all compiled files to the final package directory.
-     */
-    @Task()
-    packageMoveCompiledFiles() {
-        return gulp.src("./build/package/src/**/*")
-            .pipe(gulp.dest("./build/package"));
-    }
-
-    /**
-     * Moves all compiled files to the final package directory.
-     */
-    @Task()
-    packageClearCompileDirectory(cb: Function) {
-        return del([
-            "./build/package/src/**"
-        ], cb);
     }
 
     /**
@@ -124,9 +107,7 @@ export class Gulpfile {
     package() {
         return [
             "clean",
-            "packageCompile",
-            "packageMoveCompiledFiles",
-            "packageClearCompileDirectory",
+            "compile",
             ["packagePreparePackageFile", "packageReadmeFile", "copyTypingsFile"]
         ];
     }
