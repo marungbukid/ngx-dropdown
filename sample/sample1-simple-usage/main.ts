@@ -13,8 +13,8 @@ import {DropdownModule} from "../../src/index";
         <a href="#" dropdown-open>My Heroes</a>
         <ul class="dropdown-menu">
             <li><a href="#" (click)="select()">Badman</a></li>
-            <li><a href="#">Sadman</a></li>
-            <li><a href="#">Lieman</a></li>
+            <li><a>Sadman</a></li>
+            <li><a>Lieman</a></li>
         </ul>
     </div>
     <br/>

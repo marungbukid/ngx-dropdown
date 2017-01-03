@@ -15,7 +15,7 @@ export class DropdownOpen implements OnDestroy {
      */
     private openedByFocus: boolean = false;
 
-    private closeDropdownOnOutsideClick = (event: MouseEvent) => this.close(event);
+    private closeDropdownOnOutsideClick: (event: Event) => void;
 
     // -------------------------------------------------------------------------
     // Constructor
@@ -23,6 +23,10 @@ export class DropdownOpen implements OnDestroy {
 
     constructor(@Host() public dropdown: Dropdown,
                 private elementRef: ElementRef) {
+        const _this = this;
+        this.closeDropdownOnOutsideClick = function closeDropdownOnOutsideClick(event: MouseEvent) {
+            _this.close(event);
+        };
     }
 
     // -------------------------------------------------------------------------
@@ -38,7 +42,7 @@ export class DropdownOpen implements OnDestroy {
 
         if (this.dropdown.isOpened() && this.dropdown.toggleClick) {
             this.dropdown.close();
-            document.removeEventListener("click", this.closeDropdownOnOutsideClick);
+            document.removeEventListener("click", this.closeDropdownOnOutsideClick, true);
         } else {
             this.dropdown.open();
             document.addEventListener("click", this.closeDropdownOnOutsideClick, true);
@@ -68,7 +72,7 @@ export class DropdownOpen implements OnDestroy {
             event.relatedTarget !== this.elementRef.nativeElement) {
 
             this.dropdown.close();
-            document.removeEventListener("click", this.closeDropdownOnOutsideClick);
+            document.removeEventListener("click", this.closeDropdownOnOutsideClick, true);
         }
     }
 
@@ -77,7 +81,7 @@ export class DropdownOpen implements OnDestroy {
     // -------------------------------------------------------------------------
 
     ngOnDestroy() {
-        document.removeEventListener("click", this.closeDropdownOnOutsideClick);
+        document.removeEventListener("click", this.closeDropdownOnOutsideClick, true);
     }
 
     // -------------------------------------------------------------------------
@@ -89,7 +93,7 @@ export class DropdownOpen implements OnDestroy {
             && event.target !== this.elementRef.nativeElement
             && !this.elementRef.nativeElement.contains(event.target)) {
             this.dropdown.close();
-            document.removeEventListener("click", this.closeDropdownOnOutsideClick);
+            document.removeEventListener("click", this.closeDropdownOnOutsideClick, true);
         }
     }
 
