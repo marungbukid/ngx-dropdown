@@ -2,7 +2,8 @@ import {Directive, ElementRef, OnDestroy, Host, HostListener} from "@angular/cor
 import {Dropdown} from "./Dropdown";
 
 @Directive({
-    selector: "[dropdown-open]"
+    selector: "[dropdown-open]",
+    exportAs: "dropdownOpen"
 })
 export class DropdownOpen implements OnDestroy {
 
@@ -25,13 +26,37 @@ export class DropdownOpen implements OnDestroy {
                 private elementRef: ElementRef) {
         const _this = this;
         this.closeDropdownOnOutsideClick = function closeDropdownOnOutsideClick(event: MouseEvent) {
-            _this.close(event);
+            _this.closeIfInClosableZone(event);
         };
     }
 
     // -------------------------------------------------------------------------
     // Public Methods
     // -------------------------------------------------------------------------
+
+    toggle() {
+        if (this.dropdown.isOpened()) {
+            this.close();
+        } else {
+            this.open();
+        }
+    }
+
+    open() {
+        if (this.dropdown.isOpened())
+            return;
+
+        this.dropdown.open();
+        document.addEventListener("click", this.closeDropdownOnOutsideClick, true);
+    }
+
+    close() {
+        if (!this.dropdown.isOpened())
+            return;
+
+        this.dropdown.close();
+        document.removeEventListener("click", this.closeDropdownOnOutsideClick, true);
+    }
 
     @HostListener("click")
     openDropdown() {
@@ -41,11 +66,9 @@ export class DropdownOpen implements OnDestroy {
         }
 
         if (this.dropdown.isOpened() && this.dropdown.toggleClick) {
-            this.dropdown.close();
-            document.removeEventListener("click", this.closeDropdownOnOutsideClick, true);
+            this.close();
         } else {
-            this.dropdown.open();
-            document.addEventListener("click", this.closeDropdownOnOutsideClick, true);
+            this.open();
         }
     }
 
@@ -88,7 +111,7 @@ export class DropdownOpen implements OnDestroy {
     // Private Methods
     // -------------------------------------------------------------------------
 
-    private close(event: Event) {
+    private closeIfInClosableZone(event: Event) {
         if (!this.dropdown.isInClosableZone(<HTMLElement> event.target)
             && event.target !== this.elementRef.nativeElement
             && !this.elementRef.nativeElement.contains(event.target)) {
