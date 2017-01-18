@@ -9,7 +9,11 @@ const chai = require("chai");
 const tslint = require("gulp-tslint");
 const stylish = require("tslint-stylish");
 const ts = require("gulp-typescript");
-const sourcemaps = require("gulp-sourcemaps");
+const rename = require("gulp-rename");
+const file = require("gulp-file");
+const uglify = require("gulp-uglify");
+
+const packageName = require("./package.json").name;
 
 @Gulpclass()
 export class Gulpfile {
@@ -42,6 +46,102 @@ export class Gulpfile {
     // -------------------------------------------------------------------------
 
     /**
+     * Compiles and compiles bundles.
+     */
+    @MergedTask()
+    compileBundles() {
+        const amdTsProject = ts.createProject("tsconfig.json", {
+            module: "amd",
+            outFile: packageName + ".amd.js",
+            typescript: require("typescript")
+        });
+        const systemTsProject = ts.createProject("tsconfig.json", {
+            module: "system",
+            outFile: packageName + ".system.js",
+            typescript: require("typescript")
+        });
+        const amdPureTsProject = ts.createProject("tsconfig.json", {
+            module: "amd",
+            outFile: packageName + ".pure.amd.js",
+            noEmitHelpers: true,
+            noImplicitUseStrict: true,
+            typescript: require("typescript")
+        });
+        const systemPureTsProject = ts.createProject("tsconfig.json", {
+            module: "system",
+            outFile: packageName + ".pure.system.js",
+            noEmitHelpers: true,
+            noImplicitUseStrict: true,
+            typescript: require("typescript")
+        });
+
+        return [
+            gulp.src("build/bundle/**/*.ts")
+                .pipe(amdTsProject()).js
+                .pipe(gulp.dest("build/package")),
+
+            gulp.src("build/bundle/**/*.ts")
+                .pipe(systemTsProject()).js
+                .pipe(gulp.dest("build/package")),
+
+            gulp.src("build/bundle/**/*.ts")
+                .pipe(amdPureTsProject()).js
+                .pipe(gulp.dest("build/package")),
+
+            gulp.src("build/bundle/**/*.ts")
+                .pipe(systemPureTsProject()).js
+                .pipe(gulp.dest("build/package"))
+        ];
+    }
+
+    /**
+     * Copies all source files into destination folder in a correct structure to build bundles.
+     */
+    @Task()
+    bundleCopySources() {
+        return gulp.src(["./src/**/*.ts"])
+            .pipe(gulp.dest("./build/bundle/" + packageName));
+    }
+
+    /**
+     * Creates special main file for bundle build.
+     */
+    @Task()
+    bundleCopyMainFile() {
+        return gulp.src("./package.json", { read: false })
+            .pipe(file(packageName + ".ts", `export * from "./${packageName}/index";`))
+            .pipe(gulp.dest("./build/bundle"));
+    }
+
+    /**
+     * Uglifys bundles.
+     */
+    @MergedTask()
+    uglify() {
+        return [
+            gulp.src(`./build/package/${packageName}.pure.amd.js`)
+                .pipe(uglify())
+                .pipe(rename(`${packageName}.pure.amd.min.js`))
+                .pipe(gulp.dest("./build/package")),
+
+            gulp.src(`./build/package/${packageName}.pure.system.js`)
+                .pipe(uglify())
+                .pipe(rename(`${packageName}.pure.system.min.js`))
+                .pipe(gulp.dest("./build/package")),
+
+            gulp.src(`./build/package/${packageName}.amd.js`)
+                .pipe(uglify())
+                .pipe(rename(`${packageName}.amd.min.js`))
+                .pipe(gulp.dest("./build/package")),
+
+            gulp.src(`./build/package/${packageName}.system.js`)
+                .pipe(uglify())
+                .pipe(rename(`${packageName}.system.min.js`))
+                .pipe(gulp.dest("./build/package")),
+        ];
+    }
+
+    /**
      * Publishes a package to npm from ./build/package directory.
      */
     @Task()
@@ -50,24 +150,6 @@ export class Gulpfile {
             .pipe(shell([
                 "cd ./build/package && npm publish"
             ]));
-    }
-
-    /**
-     * Copies all sources to the package directory.
-     */
-    @MergedTask()
-    packageCompile() {
-        const tsProject = ts.createProject("tsconfig.json");
-        const tsResult = gulp.src(["./src/**/*.ts", "./typings/**/*.ts"])
-            .pipe(sourcemaps.init())
-            .pipe(ts(tsProject));
-
-        return [
-            tsResult.dts.pipe(gulp.dest("./build/package")),
-            tsResult.js
-                .pipe(sourcemaps.write(".", { sourceRoot: "", includeContent: true }))
-                .pipe(gulp.dest("./build/package"))
-        ];
     }
 
     /**
@@ -92,23 +174,16 @@ export class Gulpfile {
     }
 
     /**
-     * This task will copy typings.json file to the build package.
-     */
-    @Task()
-    copyTypingsFile() {
-        return gulp.src("./typings.json")
-            .pipe(gulp.dest("./build/package"));
-    }
-
-    /**
      * Creates a package that can be published to npm.
      */
     @SequenceTask()
     package() {
         return [
             "clean",
-            "compile",
-            ["packagePreparePackageFile", "packageReadmeFile", "copyTypingsFile"]
+            ["bundleCopySources", "bundleCopyMainFile"],
+            ["compile", "compileBundles"],
+            ["uglify"],
+            ["packagePreparePackageFile", "packageReadmeFile"]
         ];
     }
 

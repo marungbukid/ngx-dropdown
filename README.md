@@ -1,4 +1,4 @@
-# ng2-dropdown
+# ngx-dropdown
 
 Simple dropdown for your angular2 applications using bootstrap3. Does not depend of jquery.
 If you don't want to use it without bootstrap - simply create proper css classes. 
@@ -8,17 +8,17 @@ Please star a project if you liked it, or create an issue if you have problems w
 
 1. Install npm module:
     
-    `npm install ng2-dropdown --save`
+    `npm install ngx-dropdown --save`
 
 2. If you are using system.js you may want to add this into `map` and `package` config:
     
     ```json
     {
         "map": {
-            "ng2-dropdown": "node_modules/ng2-dropdown"
+            "ngx-dropdown": "node_modules/ngx-dropdown"
         },
         "packages": {
-            "ng2-dropdown": { "main": "index.js", "defaultExtension": "js" }
+            "ngx-dropdown": { "main": "index.js", "defaultExtension": "js" }
         }
     }
     ```
@@ -49,7 +49,7 @@ Please star a project if you liked it, or create an issue if you have problems w
 
 ```typescript
 import {Component} from "@angular/core";
-import {DropdownModule} from "ng2-dropdown";
+import {DropdownModule} from "ngx-dropdown";
 
 @Component({
     selector: "app",
@@ -116,5 +116,5 @@ export class AppModule {
 platformBrowserDynamic().bootstrapModule(AppModule);
 ```
 
-Take a look on samples in [./sample](https://github.com/pleerock/ng2-dropdown/tree/master/sample) for more examples of
+Take a look on samples in [./sample](https://github.com/pleerock/ngx-dropdown/tree/master/sample) for more examples of
 usages.
