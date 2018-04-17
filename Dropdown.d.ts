@@ -4,7 +4,7 @@ export declare class Dropdown {
     private elementRef;
     toggleClick: boolean;
     activateOnFocus: boolean;
-    disabled: boolean;
+    dropdownDisabled: boolean;
     onOpen: EventEmitter<{}>;
     onClose: EventEmitter<{}>;
     notClosableZone: DropdownNotClosableZone;

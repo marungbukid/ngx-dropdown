@@ -22,7 +22,7 @@ var Dropdown = /** @class */ (function () {
         // -------------------------------------------------------------------------
         this.toggleClick = true;
         this.activateOnFocus = false;
-        this.disabled = false;
+        this.dropdownDisabled = false;
         this.onOpen = new core_1.EventEmitter();
         this.onClose = new core_1.EventEmitter();
     }
@@ -30,7 +30,7 @@ var Dropdown = /** @class */ (function () {
     // Public Methods
     // -------------------------------------------------------------------------
     Dropdown.prototype.open = function () {
-        if (!this.disabled) {
+        if (!this.dropdownDisabled) {
             var element = this.elementRef.nativeElement;
             element.classList.add("open");
             this.onOpen.emit(undefined);
@@ -59,9 +59,9 @@ var Dropdown = /** @class */ (function () {
         __metadata("design:type", Object)
     ], Dropdown.prototype, "activateOnFocus", void 0);
     __decorate([
-        core_1.Input("disabled"),
+        core_1.Input("dropdownDisabled"),
         __metadata("design:type", Object)
-    ], Dropdown.prototype, "disabled", void 0);
+    ], Dropdown.prototype, "dropdownDisabled", void 0);
     __decorate([
         core_1.Output(),
         __metadata("design:type", Object)
