@@ -17,6 +17,9 @@ export class Dropdown {
     @Input("dropdownFocusActivate")
     activateOnFocus = false;
 
+    @Input("disabled")
+    isDropdownDisabled = false;
+    
     @Output()
     onOpen = new EventEmitter();
 
@@ -42,9 +45,11 @@ export class Dropdown {
     // -------------------------------------------------------------------------
 
     open() {
-        const element: HTMLElement = this.elementRef.nativeElement;
-        element.classList.add("open");
-        this.onOpen.emit(undefined);
+        if (!this.isDropdownDisabled) {
+            const element: HTMLElement = this.elementRef.nativeElement;
+            element.classList.add("open");
+            this.onOpen.emit(undefined);
+        }
     }
 
     close() {
