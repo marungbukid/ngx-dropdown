@@ -1,6 +1,6 @@
 {
   "name": "ngx-dropdown-maru",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Fork of ngx-dropdown by Umed Khudoiberdiev",
   "license": "MIT",
   "readmeFilename": "README.md",
@@ -24,7 +24,7 @@
   ],
   "main": "index.js",
   "peerDependencies": {
-    "@angular/core": "^6.0.7"
+    "@angular/core": "^6.0.0"
   },
   "devDependencies": {
     "@angular/common": "^2.4.3",
